@@ -21,6 +21,14 @@ _MovieRex_ was built as a flask application and deployed via a WSGI server.
 - `links.csv`, `movies.csv`, `rating.csv`, `tags.csv` - MovieLens data files
 - `README.txt` - MovieLens README file
 
+**`movie-recommender-screenshots`** folder:
+- `movie-recommender-movierex_home_zoomed-out.png` - screenshot of the home page of the movie recommender after login
+- `movie-recommender-movierex_landing-page.png` - screenshot of the landing page of the movie recommender
+- `movie-recommender-movierex_preference-questionnaire-example_zoomed-out.png` - screenshot of a filled out preference questionnaire
+- `movie-recommender-movierex_preference-questionnaire_zoomed-out.png` - screenshot of the preference questionnaire
+- `movie-recommender-movierex_register.png` - screenshot of the register page of the movie recommender
+- `movie-recommender-movierex_user-preferences.png` - screenshot of an exemplary user preferences page with inferred preferences from the user's ratings
+
 **`static`** folder:
 - `img/rex.png` - the logo
 - `style01.css` - style sheet for all templates
@@ -292,4 +300,5 @@ __Example:__ The total recommendation score for movies A, B and C would be:
 - recently rated movies could be weighted more for new recommendations and similarly the survey could lose weight with more time passing, as preferences might change with time
 - the application could be optimized for different devices and screens
 - allow users to delete their profile and the database entries related to it
+
 
