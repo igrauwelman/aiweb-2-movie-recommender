@@ -1,0 +1,295 @@
+{% extends "flask_user_layout.html" %}
+{% block menu %}
+    <div id="menu-div">
+        <form action = "{{ url_for('search') }}" method = "get">
+            <input type = "search" name = "movie_terms" placeholder = "Looking for a specific movie?" required>
+            <input type = "submit" value = "Search">
+        </form>
+        <form action="{{ url_for('filter') }}" method="get">
+            <select name="genre" id="genre">
+  	            <option value="" selected>genre</option>
+                <option value="Action">Action</option>
+                <option value="Adventure">Adventure</option>
+                <option value="Animation">Animation</option>
+                <option value="Children">Children's</option>
+                <option value="Comedy">Comedy</option>
+                <option value="Crime">Crime</option>
+                <option value="Documentary">Documentaries</option>
+                <option value="Drama">Drama</option>
+                <option value="Fantasy">Fantasy</option>
+                <option value="Film-Noir">Film Noir</option>
+                <option value="Horror">Horror</option>
+                <option value="IMAX">IMAX</option>
+                <option value="Musical">Musical</option>
+                <option value="Mystery">Mystery</option>
+                <option value="Romance">Romance</option>
+                <option value="Sci-Fi">Science Fiction</option>
+                <option value="Thriller">Thriller</option>
+                <option value="War">War</option>
+                <option value="Western">Western</option>
+            </select>
+            <select name="decade" id="decade">
+  	            <option value="" selected>decade</option>
+                <option value="1900">1900s</option>
+                <option value="1910">1910s</option>
+                <option value="1920">1920s</option>
+                <option value="1930">1930s</option>
+                <option value="1940">1940s</option>
+                <option value="1950">1950s</option>
+                <option value="1960">1960s</option>
+                <option value="1970">1970s</option>
+                <option value="1980">1980s</option>
+                <option value="1990">1990s</option>
+                <option value="2000">2000s</option>
+                <option value="2010">2010s</option>
+            </select>
+            <input type="submit" value="Filter" id="filter-btn">
+            <span id="filter-hint" style="display: none; color: #a94442">You need to choose at least a genre or a decade to filter</span>
+            </form>
+    </div>
+    {% endblock %}
+
+{% block content %}
+
+    {% if no_results %}
+        <h3>No results for your query</h3>
+    {% else %}
+    <h3>{{ genre_filter}} movies {% if decade_filter %}{{"from the " + decade_filter + "s"}}{% endif %}</h3>
+
+    <div class="cards-container">
+        {% for m in results %}
+        <div class="cards">
+            <div class="card-heading" id="{{ m.id }}">
+                {% if m in ignored_movies %}
+                <div class="tooltip"><a href="#" title="Include movie in recommendations"
+                                        >+</a></div>
+                {% else %}
+                <div class="tooltip"><a href="#" title="Ignore movie for recommendations"
+                                        >x</a></div>
+                {% endif %}
+                <div id="title">
+                <b>{{ m.title }}</b>
+                    </div>
+            </div>
+        <div id="card-body">
+            <p class="average"><b>average rating: {{ m.average_rating }}</b></p>
+            <p>
+                {% for g in m.genres %}
+                    <span class="label label-genres">{{ g.genre }}</span>
+                {% endfor %}
+            </p>
+        </div>
+        <div id="card-body2">
+            {% for t in m.tags %}
+                <span class="label label-tags">{{ t.tag }}</span>
+            {% endfor %}
+        </div>
+        <div id="card-links">
+            <p>
+                {% for l in m.links %}
+                    <a href="https://www.movielens.org/movies/{{ l.movie_id }}">Link to movie lens</a>
+                    <a href="https://www.imdb.com/title/tt0{{l.imdb_id}}">Link to imdb</a>
+                    <a href="https://www.themoviedb.org/movie/{{ l.tmdb_id }}">Link to tmdb</a>
+                {% endfor %}
+                </p>
+        </div>
+        <div class="card-footer" data-m-id="{{ m.id }}">
+            {% if m in movies_watchlist %}
+                    <p class="added"><i>Added to<a href="{{ url_for('watchlist_page') }}">watchlist</a></i></p>
+                {% else %}
+                    <a href="{{ url_for('add_watchlist') }}" class="add">Add to watchlist</a>
+                {% endif %}
+        {% if m in rated_movies %}
+                    <div class="rated-box">
+        <div class="rated"><b>Your rating: </b><div class="rated-num">{{ ratings[m.id] }} </div></div>
+                    </div>
+                {% else %}
+            <form action="{{ url_for('rate') }}" class="rating-form" method="post" id="{{ m.id }}">
+            <label for=rating>Your rating: </label>
+            <select name="rating" class="rating" required>
+  	            <option value="" selected disabled>stars</option>
+                <option value="1.0">1.0</option>
+                <option value="1.5">1.5</option>
+                <option value="2.0">2.0</option>
+                <option value="2.5">2.5</option>
+                <option value="3.0">3.0</option>
+                <option value="3.5">3.5</option>
+                <option value="4.0">4.0</option>
+                <option value="4.5">4.5</option>
+                <option value="5.0">5.0</option>
+            </select>
+            <input type="submit" value="Rate" class="submit-btn">
+            </form>
+        {% endif %}
+        </div>
+        </div>
+{% endfor %}
+    </div>
+    {% endif %}
+
+    <div><a href="#" class="toplink">Back to the top</a></div>
+
+<script>
+// eventListener for link to add movie to watchlist
+var watchlistAdds = document.querySelectorAll('.add');
+for (var i = 0; i < watchlistAdds.length; i++) {
+    watchlistAdds[i].addEventListener('click', addWatchlist);
+}
+// function to send to-be-added movie id and show response
+function addWatchlist(e){
+    e.preventDefault();
+
+    var movieID = e.target.parentElement.getAttribute("data-m-id");
+    //console.log(movieID);
+
+    // create AJAX request
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '../recommender.wsgi/add_watchlist', true);
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+    xhr.onload = function () {
+        if (xhr.status === 200) {
+            e.target.outerHTML = xhr.responseText;
+        } else {
+          alert('Request failed. Returned status of ' + xhr.status);
+        }
+    }
+    xhr.send('movieID=' + movieID);
+}
+</script>
+<script>
+// adapted from the recommender base with js
+// Event (submission) listener for rating forms
+var forms = document.querySelectorAll('.rating-form');
+for (var i = 0; i < forms.length; i++) {
+    forms[i].addEventListener('submit', rateMovie);
+}
+// function to send to-be-rated movie id and rating and show rating
+function rateMovie(e) {
+    e.preventDefault();
+
+    var movieID = e.target.id;
+    //console.log(movieID)
+    var currentForm = e.currentTarget
+    var data = new FormData(currentForm);
+    var rating = data.get("rating");
+    //console.log(data);
+    //console.log(rating);
+
+    // create AJAX request
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '../recommender.wsgi/rate', true);
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+    xhr.onload = function () {
+        if (xhr.status === 200) {
+            currentForm.innerHTML = xhr.responseText;
+        } else {
+          alert('Request failed. Returned status of ' + xhr.status);
+        }
+    }
+    xhr.send('movieID=' + movieID + '&rating=' + rating);
+}
+
+</script>
+<script>
+// eventListener for filter-btn (in addition to the "onchange" above)
+document.getElementById("filter-btn").addEventListener('click', disableButton);
+
+// function to disable "Filter" button if neither a genre nor a decade have been selected
+function disableButton(event){
+    var decade = document.getElementById("decade").value;
+    var genre = document.getElementById("genre").value;
+    var filterHint = document.getElementById("filter-hint");
+   // console.log(decade);
+    //console.log(genre);
+
+    // if both the value of the selected decade and the selected genre are empty: disable submit button
+    if (decade.length === 0 && genre.length === 0) {
+        event.preventDefault();
+        filterHint.style.display = "inline";
+        setTimeout(function hideHint() {
+            filterHint.style.display = "none";}, 10000);
+    }
+    if (decade.length > 0 || genre.length > 0) {
+            filterHint.style.display = "none";
+        }
+}
+</script>
+<script>
+// EventListener for the ignore link ("x")
+var toIgnore = document.querySelectorAll(".tooltip");
+for (var i = 0; i < toIgnore.length; i++) {
+    toIgnore[i].addEventListener('click', ignoreMovie);
+}
+// function to ignore a movie for the recommendations
+function ignoreMovie(e){
+    e.preventDefault();
+
+    var movieID = e.currentTarget.parentElement.id;
+    //console.log(movieID);
+    var currentCard = e.currentTarget.parentElement.parentElement;
+    var symbol = e.target.textContent;
+    //console.log(symbol);
+
+    // if user clicks to ignore a movie
+    if (symbol === "x"){
+        // create AJAX request
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '../recommender.wsgi/ignore', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        xhr.onload = function () {
+        if (xhr.status === 200) {
+            // in addition to symbol change put an inner shadow on the respective card
+            currentCard.style.boxShadow = "33em 25em 5px lightgrey inset";
+            e.target.innerHTML = "+";
+            e.target.title = "Include movie in recommendations";
+
+        } else {
+          alert('Request failed. Returned status of ' + xhr.status);
+        }
+    }
+    xhr.send('movieID=' + movieID);
+        // if user clicks to re-include movie
+    } else if (symbol === "+"){
+        //console.log("revoke:" + movieID);
+
+        // create AJAX request
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '../recommender.wsgi/revoke_ignore', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                // delete inner shadow and show "x" again
+                currentCard.style.boxShadow = "none";
+                e.target.innerHTML = "x";
+                e.target.title = "Ignore movie for recommendations";
+            } else {
+                alert('Request failed. Returned status of ' + xhr.status);
+            }
+        }
+    xhr.send('movieID=' + movieID);
+    }
+}
+</script>
+<script>
+// function to check whether the displayed movies are ignored and then give them the inner shadow
+window.onload = function testShadows(){
+    var cards = document.querySelectorAll('.cards');
+    var cardHeadings = document.querySelectorAll('.card-heading');
+
+    var ignoredMovies = {{ ignored_movies_ids | tojson }};
+
+    for (var i = 0; i < cards.length; i++) {
+        for (var j = 0; j < ignoredMovies.length; j++) {
+            console.log((String(ignoredMovies[j]) === String(cardHeadings[i].id)))
+            if (String(ignoredMovies[j]) === String(cardHeadings[i].id)) {
+                cards[i].style.boxShadow = "33em 25em 5px lightgrey inset";
+            }
+        }
+     }
+}
+</script>
+{% endblock %}

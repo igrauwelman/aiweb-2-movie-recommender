@@ -1,0 +1,18 @@
+<!-- landing page when not logged in -->
+{% extends "flask_user_layout.html" %}
+{% block header %}
+{% endblock %}
+{% block content %}
+   <div>
+       <h2 style="margin-top: 2em">Welcome to </h2><img src="{{url_for('static', filename="img/rex.png")}}"
+                                                        alt="dinosaur logo" width="300" height="100"
+                                                        style="margin-left: 40%; margin-right: 40%">
+    </div>
+    <h4>Your personal movie recommender and archive to discover new movies based on your preferences!</h4>
+    <section id="sectionleft" class="with-margins">
+    <h3 class="section-text">New here? <a href={{ url_for('user.register') }}>Register</a></h3>
+    </section>
+    <section id="sectionright" class="with-margins">
+    <h3 class="section-text"><a href={{ url_for('user.login') }}>Sign in</a></h3>
+    </section>
+{% endblock %}

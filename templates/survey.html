@@ -1,0 +1,217 @@
+{% extends "flask_user_layout.html" %}
+{% block header %}
+<div id="header-div" class="clearfix with-margins">
+        <div class="pull-left">
+            <img src="{{url_for('static', filename="img/rex.png")}}" alt="dinosaur logo" width="300" height="100">
+        </div>
+</div>
+{% endblock %}
+
+{% block content %}
+
+{% if is_new %}
+    <p style="text-align: center">To start off with better recommendations, you can tell us which genres you usually
+        (don't) enjoy watching.<br>
+    You can also <a href="{{ url_for('home_page') }}">skip this</a> and start off with popular movies.</p>
+    {% else %}
+    <p style="text-align: center">Select the genres you usually (don't) enjoy watching. To delete your previous answers,
+        please <a href="{{ url_for('survey_submit') }}">submit an empty survey.</a> To keep your previous answers,
+        <a href="{{ url_for('preferences_page') }}">click here</a>.</p>
+    {% endif %}
+
+    <div id="survey-div">
+    <h4 style="text-align: left">Which movie genre(s) do you enjoy watching?</h4>
+    <form action="{{ url_for('survey_submit') }}" id="survey" method="post">
+    <ul id="survey-boxes">
+        <li>
+        <input type="checkbox" id="genre-action-pos" name="genre-incl" value="Action">
+        <label for="genre-action-pos"> Action</label>
+        </li>
+        <li>
+        <input type="checkbox" id="genre-adventure-pos" name="genre-incl" value="Adventure">
+        <label for="genre-adventure-pos">Adventure</label>
+        </li>
+        <li>
+        <input type="checkbox" id="genre-animation-pos" name="genre-incl" value="Animation">
+        <label for="genre-animation-pos">Animation</label>
+        </li>
+        <li>
+        <input type="checkbox" id="genre-children-pos" name="genre-incl" value="Children">
+        <label for="genre-children-pos">Children's movies</label>
+        </li>
+        <li>
+        <input type="checkbox" id="genre-comedy-pos" name="genre-incl" value="Comedy">
+        <label for="genre-comedy-pos">Comedy</label>
+        </li>
+        <li>
+        <input type="checkbox" id="genre-crime-pos" name="genre-incl" value="Crime">
+        <label for="genre-crime-pos">Crime</label>
+        </li>
+        <li>
+        <input type="checkbox" id="genre-documentary-pos" name="genre-incl" value="Documentary">
+        <label for="genre-documentary-pos">Documentaries</label>
+        </li>
+        <li>
+        <input type="checkbox" id="genre-drama-pos" name="genre-incl" value="Drama">
+        <label for="genre-drama-pos">Drama</label>
+        </li>
+        <li>
+        <input type="checkbox" id="genre-fantasy-pos" name="genre-incl" value="Fantasy">
+        <label for="genre-fantasy-pos">Fantasy</label>
+        </li>
+        <li>
+        <input type="checkbox" id="genre-film-noir-pos" name="genre-incl" value="Film-Noir">
+        <label for="genre-film-noir-pos">Film Noir</label>
+        </li>
+        <li>
+        <input type="checkbox" id="genre--horror-pos" name="genre-incl" value="Horror">
+        <label for="genre--horror-pos">Horror</label>
+        </li>
+        <li>
+        <input type="checkbox" id="genre-IMAX-pos" name="genre-incl" value="IMAX">
+        <label for="genre-IMAX-pos">IMAX</label>
+        </li>
+        <li>
+        <input type="checkbox" id="genre-musical-pos" name="genre-incl" value="Musical">
+        <label for="genre-musical-pos">Musical</label>
+        </li>
+        <li>
+        <input type="checkbox" id="genre-mystery-pos" name="genre-incl" value="Mystery">
+        <label for="genre-mystery-pos">Mystery</label><br>
+        </li>
+        <li>
+        <input type="checkbox" id="genre-romance-pos" name="genre-incl" value="Romance">
+        <label for="genre-romance-pos">Romance</label>
+        </li>
+        <li>
+        <input type="checkbox" id="genre-sci-fi-pos" name="genre-incl" value="Sci-Fi">
+        <label for="genre-sci-fi-pos">Science Fiction</label>
+        </li>
+        <li>
+        <input type="checkbox" id="genre-thriller-pos" name="genre-incl" value="Thriller">
+        <label for="genre-thriller-pos">Thriller</label>
+        </li>
+        <li>
+        <input type="checkbox" id="genre-war-pos" name="genre-incl" value="War">
+        <label for="genre-war-pos">War</label>
+        </li>
+        <li>
+        <input type="checkbox" id="genre-western-pos" name="genre-incl" value="Western">
+        <label for="genre-western-pos">Western</label>
+        </li>
+        </ul>
+    <h4 style="text-align: left">Which genre(s) do you usually NOT enjoy watching?</h4>
+        <ul id="survey-boxes-excl">
+        <li>
+        <input type="checkbox" id="genre-action-neg" name="genre-excl" value="Action">
+        <label for="genre-action-neg"> Action</label>
+        </li>
+        <li>
+        <input type="checkbox" id="genre-adventure-neg" name="genre-excl" value="Adventure">
+        <label for="genre-adventure-neg">Adventure</label>
+        </li>
+        <li>
+        <input type="checkbox" id="genre-animation-neg" name="genre-excl" value="Animation">
+        <label for="genre-animation-neg">Animation</label>
+        </li>
+        <li>
+        <input type="checkbox" id="genre-children-neg" name="genre-excl" value="Children">
+        <label for="genre-children-neg">Children's movies</label>
+        </li>
+        <li>
+        <input type="checkbox" id="genre-comedy-neg" name="genre-excl" value="Comedy">
+        <label for="genre-comedy-neg">Comedy</label>
+        </li>
+        <li>
+        <input type="checkbox" id="genre-crime-neg" name="genre-excl" value="Crime">
+        <label for="genre-crime-neg">Crime</label>
+        </li>
+        <li>
+        <input type="checkbox" id="genre-documentary-neg" name="genre-excl" value="Documentary">
+        <label for="genre-documentary-neg">Documentaries</label>
+        </li>
+        <li>
+        <input type="checkbox" id="genre-drama-neg" name="genre-excl" value="Drama">
+        <label for="genre-drama-neg">Drama</label>
+        </li>
+        <li>
+        <input type="checkbox" id="genre-fantasy-neg" name="genre-excl" value="Fantasy">
+        <label for="genre-fantasy-neg">Fantasy</label>
+        </li>
+        <li>
+        <input type="checkbox" id="genre-film-noir-neg" name="genre-excl" value="Film-Noir">
+        <label for="genre-film-noir-neg">Film Noir</label>
+        </li>
+        <li>
+        <input type="checkbox" id="genre-horror-neg" name="genre-excl" value="Horror">
+        <label for="genre-horror-neg">Horror</label>
+        </li>
+        <li>
+        <input type="checkbox" id="genre-IMAX-neg" name="genre-excl" value="IMAX">
+        <label for="genre-IMAX-neg">IMAX</label>
+        </li>
+        <li>
+        <input type="checkbox" id="genre-musical-neg" name="genre-excl" value="Musical">
+        <label for="genre-musical-neg">Musical</label>
+        </li>
+        <li>
+        <input type="checkbox" id="genre-mystery-neg" name="genre-excl" value="Mystery">
+        <label for="genre-mystery-neg">Mystery</label><br>
+        </li>
+        <li>
+        <input type="checkbox" id="genre-romance-neg" name="genre-excl" value="Romance">
+        <label for="genre-romance-neg">Romance</label>
+        </li>
+        <li>
+        <input type="checkbox" id="genre-sci-fi-neg" name="genre-excl" value="Sci-Fi">
+        <label for="genre-sci-fi-neg">Science Fiction</label>
+        </li>
+        <li>
+        <input type="checkbox" id="genre-thriller-neg" name="genre-pos" value="Thriller">
+        <label for="genre-thriller-neg">Thriller</label>
+        </li>
+        <li>
+        <input type="checkbox" id="genre-war-neg" name="genre-excl" value="War">
+        <label for="genre-war-neg">War</label>
+        </li>
+        <li>
+        <input type="checkbox" id="genre-western-neg" name="genre-excl" value="Western">
+        <label for="genre-western-neg">Western</label>
+        </li>
+        </ul>
+    <input type="submit" value="Submit">
+    </form>
+    <div style="color:#a94442; display: none; text-align: center" id="error-survey">You selected <div id="error-genres" style="display: inline"></div> for both questions.
+        Please revise your answers.</div>
+    </div>
+
+
+<script>
+// eventListener for the survey submission
+document.getElementById('survey').addEventListener('submit', showError);
+// function to test whether the checked liked and disliked genres contain the same values
+    function showError(e){
+    const data = new FormData(e.target);
+    var inclData = data.getAll("genre-incl");
+    var exclData = data.getAll("genre-excl");
+    //console.log(inclData);
+    //console.log(exclData);
+    let same = [];
+
+    for (let i = 0; i < inclData.length; i++){
+        for (let j = 0; j < exclData.length; j++){
+            if (inclData[i] === exclData[j]){
+                same.push(inclData[i]);
+            }
+            }
+        }
+    // if there are genres checked for both questions: show error messages with respective genres
+    if (same.length > 0){
+        e.preventDefault();
+        //console.log(same);
+        document.getElementById("error-survey").style.display = "block";
+        document.getElementById("error-genres").innerHTML = same;
+    }
+}
+</script>
+{% endblock %}

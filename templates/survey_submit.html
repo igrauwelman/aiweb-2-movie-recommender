@@ -1,0 +1,17 @@
+{% extends "flask_user_layout.html" %}
+{% block header %}
+<div id="header-div" class="clearfix with-margins">
+        <div class="pull-left">
+            <img src="{{url_for('static', filename="img/rex.png")}}" alt="dinosaur logo" width="300" height="100">
+        </div>
+</div>
+{% endblock %}
+
+{% block content %}
+
+    <h3>Thank you for your answers!</h3>
+    <h4>You can always return to the survey in your profile preferences.</h4>
+    <p style="text-align: center">You will now be redirected to the home page...
+        This may take a moment while your recommendations are prepared.</p>
+
+{% endblock %}

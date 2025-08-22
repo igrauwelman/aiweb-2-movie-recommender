@@ -1,0 +1,71 @@
+{% extends "flask_user_layout.html" %}
+{% block content %}
+    <h2>Preferences</h2>
+
+    <section id="sectionpref-left" class="with-margins">
+    <h4>Preferences from rated movies</h4>
+    {% if liked_genres %}
+        <ul class="list-pref">
+        The genres you seem to like:
+            {% for genre in extracted_liked_genres %}
+                <li>{{ genre }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    {% if disliked_genres %}
+        <ul class="list-pref">
+    	The genres you don't seem to like:
+        {% for genre in extracted_disliked_genres %}
+            <li>{{ genre }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+    {% if liked_decades %}
+        <ul class="list-pref">
+        You seem to like movies from the following decades:
+            {% for decade in extracted_liked_decades %}
+                <li>{{ decade }}s</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    {% if disliked_decades %}
+        <ul class="list-pref">
+        You don't seem to like movies from the following decades:
+            {% for decade in extracted_disliked_decades %}
+                <li>{{ decade }}s</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    {% if not liked_decades and not liked_genres and not disliked_genres and not disliked_decades %}
+        <p>Currently, no preferences can be estimated.</p>
+    {% endif %}
+    </section>
+    <section id="sectionpref-right" class="with-margins">
+    <h4>Preferences from survey</h4>
+    {% if liked_genres_survey %}
+        <ul class="list-pref">
+            Preferred genres:
+            {% for genre in liked_genres_survey %}
+            <li>{{ genre }}</li>
+    {% endfor %}
+        </ul>
+    {% endif %}
+    {% if disliked_genres_sur %}
+    <ul class="list-pref">
+    Excluded genres:
+        {% for genre in disliked_genres_survey %}
+            <li>{{ genre }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% if not liked_genres_survey and not disliked_genres_sur %}
+    <p>You did not specify any preferences in the survey.</p>
+    {% endif %}
+    <br>
+    <p>You can <a href="{{ url_for('survey_page') }}">edit your survey</a>, if you want to.
+        To delete your preferences, please submit an empty survey.</p>
+    </section>
+
+
+
+{% endblock %}

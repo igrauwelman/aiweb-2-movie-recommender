@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ user_manager.USER_APP_NAME }}</title>
+
+    <!-- Bootstrap -->
+    <!--<link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">-->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style01.css') }}">
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7/html5shiv.js"></script>
+      <script src="//cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.js"></script>
+    <![endif]-->
+
+    {# *** Allow sub-templates to insert extra html to the head section *** #}
+    {% block extra_css %}{% endblock %}
+  </head>
+
+<body>
+<div id="page-container">
+    {% block body %}
+    {% block header %}
+    <div id="header-div" class="clearfix with-margins">
+        <div class="pull-left">
+            <a href="{{ url_for('loading') }}">
+            <img src="{{url_for('static', filename="img/rex.png")}}" alt="MovieRex dinosaur logo" width="300" height="100">
+            </a>
+        </div>
+        <div class="pull-right">
+            {% if call_or_get(current_user.is_authenticated) %}
+            <div class="dropdown">
+            <button onclick="toggle_dropdown()" class="dropbtn">{{ current_user.username }}</button>
+        <div id="dropdownProfile" class="dropdown-content">
+        <a href="{{ url_for('loading') }}">Recommendations</a>
+        <a href="{{ url_for('watchlist_page') }}">Watchlist</a>
+        <a href="{{ url_for('preferences_page') }}">Preferences</a>
+        <a href="{{ url_for('rated_movies_page') }}">Rated movies</a>
+        <a href="{{ url_for('ignored_movies_page') }}">Ignored movies</a>
+        <a href="{{ url_for('user.change_username') }}">Change username</a>
+        <a href="{{ url_for('user.change_password') }}">Change password</a>
+        <a href="{{ url_for('user.logout') }}">{%trans%}Sign out{%endtrans%}</a>
+        </div>
+    </div>
+            {% endif %}
+        </div>
+    </div>
+
+<script>
+// When the user clicks on the button, alternate between hiding and showing the dropdown //
+function toggle_dropdown() {
+  document.getElementById("dropdownProfile").classList.toggle("show");
+}
+
+// Close the dropdown if the user clicks outside of it
+window.onclick = function(event) {
+  if (!event.target.matches('.dropbtn')) {
+    let dropdowns = document.getElementsByClassName("dropdown-content");
+    let i;
+    for (i = 0; i < dropdowns.length; i++) {
+      let openDropdown = dropdowns[i];
+      if (openDropdown.classList.contains('show')) {
+        openDropdown.classList.remove('show');
+      }
+    }
+  }
+}
+</script>
+        {% endblock %}
+<script>
+// hide flash message after 2s
+setTimeout(function hide_messages(){document.getElementById('messages').style.display = "none";}, 4000);
+    </script>
+
+
+    <div id="main-div" class="with-margins">
+    {# One-time system messages called Flash messages #}
+    {% block flash_messages %}
+        <div id="messages">
+        {%- with messages = get_flashed_messages(with_categories=true) -%}
+            {% if messages %}
+                {% for category, message in messages %}
+                    {% if category=='error' %}
+                        {% set category='danger' %}
+                    {% endif %}
+                    <div class="alert alert-{{category}}">{{ message|safe }}</div>
+                {% endfor %}
+            {% endif %}
+        {%- endwith %}
+        </div>
+    {% endblock %}
+
+
+    {% block menu %}
+
+    {% endblock %}
+
+
+    {% block main %}
+        {% block content %}{% endblock %}
+    {% endblock %}
+    </div>
+</div>
+    
+    {% endblock %}
+
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+
+
+    {# *** Allow sub-templates to insert extra html to the bottom of the body *** #}
+    {% block extra_js %}{% endblock %}
+
+  </body>
+</html>

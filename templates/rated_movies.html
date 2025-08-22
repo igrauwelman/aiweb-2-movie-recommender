@@ -1,0 +1,168 @@
+{% extends "flask_user_layout.html" %}
+{% block content %}
+
+    {% if no_movies %}
+    <h2>Rated movies</h2>
+    <p style="text-align: center">Currently, you have no rated movies.</p>
+    {% else %}
+
+    <div class="cards-container">
+    <h2>Rated movies</h2>
+        {% for m in rated_movies %}
+        <div class="cards">
+            <div class="card-heading" id="{{ m.id }}">
+                {% if m in ignored_movies %}
+                <div class="tooltip"><a href="#" title="Include movie in recommendations"
+                                        >+</a></div>
+                {% else %}
+                <div class="tooltip"><a href="#" title="Ignore movie for recommendations"
+                                        >x</a></div>
+                {% endif %}
+                <div id="title">
+                <b>{{ m.title }}</b>
+                    </div>
+            </div>
+        <div id="card-body">
+            <p class="average"><b>average rating: {{ m.average_rating }}</b></p>
+            <p>
+                {% for g in m.genres %}
+                    <span class="label label-genres">{{ g.genre }}</span>
+                {% endfor %}
+            </p>
+        </div>
+        <div id="card-body2">
+            {% for t in m.tags %}
+                <span class="label label-tags">{{ t.tag }}</span>
+            {% endfor %}
+        </div>
+        <div id="card-links">
+            <p>
+                {% for l in m.links %}
+                    <a href="https://www.movielens.org/movies/{{ l.movie_id }}">Link to movie lens</a>
+                    <a href="https://www.imdb.com/title/tt0{{l.imdb_id}}">Link to imdb</a>
+                    <a href="https://www.themoviedb.org/movie/{{ l.tmdb_id }}">Link to tmdb</a>
+                {% endfor %}
+                </p>
+        </div>
+        <div class="card-footer" data-m-id="{{ m.id }}">
+                {% if m in movies_watchlist %}
+                    <p class="added"><i>Added to<a href="{{ url_for('watchlist_page') }}">watchlist</a></i></p>
+                {% else %}
+                    <a href="{{ url_for('add_watchlist') }}" class="add">Add to watchlist</a>
+                {% endif %}
+            <div id="footer-rating">
+                <div class="rated-box">
+                    <div class="rated"><b>Your rating: </b><div class="rated-num">{{ ratings[m.id] }} </div></div>
+                </div>
+                </div>
+            </div>
+        </div>
+{% endfor %}
+    </div>
+
+<div><a href="#" class="toplink">Back to the top</a></div>
+
+    {% endif %}
+
+<script>
+var watchlistAdds = document.querySelectorAll('.add');
+for (var i = 0; i < watchlistAdds.length; i++) {
+    watchlistAdds[i].addEventListener('click', addWatchlist);
+}
+
+function addWatchlist(e){
+    e.preventDefault();
+
+    var movieID = e.target.parentElement.getAttribute("data-m-id");
+    //console.log(movieID);
+
+    // create AJAX request
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '../recommender.wsgi/add_watchlist', true);
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+    xhr.onload = function () {
+        if (xhr.status === 200) {
+            e.target.outerHTML = xhr.responseText;
+        } else {
+          alert('Request failed. Returned status of ' + xhr.status);
+        }
+    }
+    xhr.send('movieID=' + movieID);
+}
+</script>
+<script>
+// EventListener for the ignore link ("x")
+var toIgnore = document.querySelectorAll(".tooltip");
+for (var i = 0; i < toIgnore.length; i++) {
+    toIgnore[i].addEventListener('click', ignoreMovie);
+}
+// function to ignore a movie for the recommendations
+function ignoreMovie(e){
+    e.preventDefault();
+
+    var movieID = e.currentTarget.parentElement.id;
+    //console.log(movieID);
+    var currentCard = e.currentTarget.parentElement.parentElement;
+    var symbol = e.target.textContent;
+    //console.log(symbol);
+
+    if (symbol === "x"){
+        // create AJAX request
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '../recommender.wsgi/ignore', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        xhr.onload = function () {
+        if (xhr.status === 200) {
+            // in addition to symbol change put an inner shadow on the respective card
+            currentCard.style.boxShadow = "33em 25em 5px lightgrey inset";
+            e.target.innerHTML = "+";
+            e.target.title = "Include movie in recommendations";
+
+        } else {
+          alert('Request failed. Returned status of ' + xhr.status);
+        }
+    }
+    xhr.send('movieID=' + movieID);
+} else if (symbol === "+"){
+        //console.log("revoke:" + movieID);
+
+        // create AJAX request
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '../recommender.wsgi/revoke_ignore', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+    xhr.onload = function () {
+        if (xhr.status === 200) {
+            // delete inner shadow and show "x" again
+            currentCard.style.boxShadow = "none";
+            e.target.innerHTML = "x";
+            e.target.title = "Ignore movie for recommendations";
+        } else {
+          alert('Request failed. Returned status of ' + xhr.status);
+        }
+    }
+    xhr.send('movieID=' + movieID);
+    }
+}
+</script>
+<script>
+// function to check whether the displayed movies are ignored and then give them the inner shadow
+window.onload = function testShadows(){
+    var cards = document.querySelectorAll('.cards');
+    var cardHeadings = document.querySelectorAll('.card-heading');
+
+    var ignoredMovies = {{ ignored_movies_ids | tojson }};
+
+    for (var i = 0; i < cards.length; i++) {
+        for (var j = 0; j < ignoredMovies.length; j++) {
+            console.log((String(ignoredMovies[j]) === String(cardHeadings[i].id)))
+            if (String(ignoredMovies[j]) === String(cardHeadings[i].id)) {
+                cards[i].style.boxShadow = "33em 24em 5px lightgrey inset";
+            }
+        }
+     }
+}
+</script>
+{% endblock %}
